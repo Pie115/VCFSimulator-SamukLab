@@ -150,7 +150,7 @@ class MyVcfSim:
                 f.write(lines)
             f.write('#' + tempdata)
 
-        os.remove('mytempvcf.txt')
+        #os.remove('mytempvcf.txt')
         
     def make_population_file(self):
 

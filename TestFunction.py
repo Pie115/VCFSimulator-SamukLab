@@ -62,7 +62,7 @@ def vcf_simulator(amountofruns = 1, seed = 1000, foldername = 'PixyFolder'):
         sim.simulate_vcfs()
         seed+=1
 
-mass_simulator(10000, 2, 17000000, 0.0000000055, 20, 1234, 'my.vcf', 20, 'population.txt', 'PixyFolder', 10)
+mass_simulator(10000, 2, 1700000, 0.0000000055, 0, 1234, 'my.vcf', 20, 'population.txt', 'PixyFolder', 50)
 #Mass simulator function to run everything above.
 #Parameters in order: Site Size, Ploidy, Population, Mutation Rate, Percent Of Missing data to be taken out,-
 #Starting seed, Output VCF file, Sample Size, Sample file, Output Folder, Amount of times to run everything
