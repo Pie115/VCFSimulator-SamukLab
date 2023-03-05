@@ -150,7 +150,7 @@ class MyVcfSim:
                 f.write(lines)
             f.write('#' + tempdata)
 
-        #os.remove('mytempvcf.txt')
+        os.remove('mytempvcf.txt')
         
     def make_population_file(self):
 
@@ -163,6 +163,7 @@ class MyVcfSim:
     def simulate_vcfs(self):
         
         ts = msprime.sim_ancestry(samples=[msprime.SampleSet(self.samp_num, ploidy=self.ploidy)], population_size = self.pop_num, random_seed=self.randoseed, sequence_length = self.site_size)
+        #sample here without changes^
 
         #sequence length and site size have to be set to SAME number
 
