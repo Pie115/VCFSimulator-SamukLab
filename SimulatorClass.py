@@ -53,7 +53,105 @@ class MyVcfSim:
 
         with open(self.outputfile, "w") as f:
             ts.write_vcf(f, site_mask=site_mask)
+            
+        f = open(self.outputfile, 'r')
+        d = open('mytempvcf.txt', 'w')
 
+        a = f.readline()
+        linenum = 1
+
+        while(a):
+            if(linenum > 5):
+                if(linenum == 6):
+                    a = a[1:]
+                d.write(a)
+            a = f.readline()
+            linenum += 1
+
+        f.close()
+        d.close()
+
+        vcfdata = pd.read_csv('mytempvcf.txt', delimiter = '\t')
+        tempvcf = pd.read_csv('mytempvcf.txt', delimiter = '\t')
+
+        a = 'tsk_0'
+        
+        for i in range(self.samp_num):
+            a = a.replace(str(i-1), str(i))
+            if(self.ploidy != 1):
+                tempvcf[a] = tempvcf[a].str.replace(r'|', '')
+
+        rows = len(tempvcf.index)
+        iteration = 0
+
+        while(iteration < rows):
+            uniquelist = []
+            a = 'tsk_0'
+
+            for i in range(self.samp_num):
+                a = a.replace(str(i-1), str(i))
+                altlist = tempvcf[a][iteration]
+                #print(altlist)
+                if(self.ploidy != 1):
+                    uniquelist.extend(eval(i) for i in list(altlist))
+                elif(self.ploidy == 1):
+                    uniquelist.append(tempvcf[a][iteration])
+
+            a = 'ALT'
+            altlist = tempvcf[a][iteration]
+            altlist = altlist.replace(r',','')
+            altlist = list(altlist)
+            
+            #print(altlist)
+            uniquelist = np.unique(uniquelist)
+            #print(uniquelist)
+            if(len(uniquelist) == 1):
+                while(len(altlist) > len(uniquelist)):
+                    altlist.pop()
+            elif(sum(uniquelist) == 0):
+                while(len(altlist) > 0):
+                    altlist.pop()
+            else:
+                while(len(altlist) >= len(uniquelist)):
+                    altlist.pop()
+
+            if(len(altlist) == 0):
+                altlist = "."
+            else:
+                altlist = ','.join(altlist)
+
+            vcfdata[a][iteration] = altlist
+            #print(altlist)
+            #print(uniquelist)
+            #print("\n")
+            iteration += 1
+
+        #print(tempvcf)
+        #print(vcfdata)
+
+        f = open(self.outputfile, 'r')
+        linenum = 1
+        filearr = []
+        a = f.readline()
+
+        while(a):
+            if(linenum < 6):
+                filearr.append(a)
+            a = f.readline()
+            linenum += 1
+        os.remove(self.outputfile)
+
+        vcfdata.to_csv(self.outputfile, mode = 'a', index = False, sep = '\t', header = True)
+
+        with open(self.outputfile, 'r+') as f: 
+            tempdata = f.read() 
+            f.seek(0, 0) 
+            for lines in filearr:
+                f.write(lines)
+            f.write('#' + tempdata)
+
+        os.remove('mytempvcf.txt')
+        
     def make_population_file(self):
 
         file = open(self.samp_file, "a") #Makes a text file full of population data as a parameter for pixy
