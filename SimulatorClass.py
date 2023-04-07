@@ -32,23 +32,23 @@ class MyVcfSim:
         rand_array = np.random.choice(mylist, self.site_size, replace=False) #fills a new array with random non repeating values from last step
         
 
-        print('Total Amount:', temp_array.size)  #Shows total amount of sites
+        #print('Total Amount:', temp_array.size)  #Shows total amount of sites
 
-        print('----------------')
+        #print('----------------')
 
         for x in counter:
             temp_array[rand_array[x]] = 1 #Changes value to 1 which deletes the value
 
-        print('Amount Missing:', np.sum(temp_array))
+        #print('Amount Missing:', np.sum(temp_array))
 
-        print('----------------')
+        #print('----------------')
         
         rand_array = np.empty(self.site_size, dtype = int)
                 
         return temp_array
 
     def make_missing_vcf(self, ts):
-
+        loading = 0
         site_mask = self.make_site_mask() #Makes sites from the number of sites in ts
 
         with open(self.outputfile, "w") as f:
@@ -85,6 +85,10 @@ class MyVcfSim:
         iteration = 0
 
         while(iteration < rows):
+        
+            if(iteration == 90):
+                print("Loading VCF...")
+                
             uniquelist = []
             a = 'tsk_0'
 
@@ -102,19 +106,46 @@ class MyVcfSim:
             altlist = altlist.replace(r',','')
             altlist = list(altlist)
             
-            #print(altlist)
+            #print(altlist)            
+            
+            #=====================================================================
+            referencegenome = uniquelist[0]
+            #print("old", altlist)
+            #print("old", uniquelist)
+            if(referencegenome != 0):
+                oldref = tempvcf['REF'][iteration]
+                vcfdata['REF'][iteration] = altlist[referencegenome-1]
+                altlist.remove(altlist[referencegenome-1])
+                altlist.append(oldref)
+                
+                for i in range(len(uniquelist)):
+                    if(uniquelist[i] == 0):
+                        uniquelist[i] = len(altlist)
+                    elif(uniquelist[i] == referencegenome):
+                        uniquelist[i] = 0
+                    elif(uniquelist[i] != 1):
+                        uniquelist[i] -= 1
+                  
+            #print("new", altlist)
+            #print("ref", vcfdata['REF'][iteration])            
+            #print(referencegenome)
+            #print("new", uniquelist)
+            #======================================================================
+            
+            
+            
+            finaloutput = uniquelist   #getting temp array
             uniquelist = np.unique(uniquelist)
             #print(uniquelist)
-            if(len(uniquelist) == 1):
-                while(len(altlist) > len(uniquelist)):
-                    altlist.pop()
-            elif(sum(uniquelist) == 0):
-                while(len(altlist) > 0):
-                    altlist.pop()
-            else:
-                while(len(altlist) >= len(uniquelist)):
-                    altlist.pop()
-
+            
+            templist = []
+            for i in range(len(altlist)):
+                if (i+1) in uniquelist:          
+                    #print(templist.append(altlist[i]))
+                    templist.append(altlist[i])
+                #print(templist)
+            altlist = templist
+            
             if(len(altlist) == 0):
                 altlist = "."
             else:
@@ -124,11 +155,27 @@ class MyVcfSim:
             #print(altlist)
             #print(uniquelist)
             #print("\n")
-            iteration += 1
 
+            finaldata = [finaloutput[i:i+self.ploidy] for i in range(0, len(finaloutput), self.ploidy)]
+            finaldataoutput = ["|".join(str(i) for i in data) for data in finaldata]
+            #print(finaldataoutput)
+
+            a = 'tsk_0'
+
+            for i in range(self.samp_num):
+                a = a.replace(str(i-1), str(i))
+                #print(a, finaldataoutput[i])
+                vcfdata[a][iteration] = finaldataoutput[i]
+                
+            if(iteration % 1000 == 0):
+                print("[{0}] {1}%".format("=" * (loading + 10), loading), end="\r")
+                loading +=10
+            iteration += 1
+        print("[{0}] {1}%".format("=" * (loading + 10), loading), end="\r")
+        print("\nDone!")
         #print(tempvcf)
         #print(vcfdata)
-
+        
         f = open(self.outputfile, 'r')
         linenum = 1
         filearr = []
@@ -184,7 +231,8 @@ class MyVcfSim:
         ts = tables.tree_sequence()
 
         ts = msprime.sim_mutations(ts, rate=self.mutationrate, random_seed=self.randoseed) #Mutates the sites at random
-
+        #with open(self.outputfile, "w") as f:
+            #ts.write_vcf(f)
         self.make_missing_vcf(ts)
 
         #os.system('cat my.vcf | grep "^#" > vcf_new.vcf')
