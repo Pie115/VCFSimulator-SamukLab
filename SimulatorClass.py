@@ -85,8 +85,10 @@ class MyVcfSim:
         iteration = 0
 
         while(iteration < rows):
+        
             if(iteration == 90):
                 print("Loading VCF...")
+                
             uniquelist = []
             a = 'tsk_0'
 
@@ -104,8 +106,7 @@ class MyVcfSim:
             altlist = altlist.replace(r',','')
             altlist = list(altlist)
             
-            #print(altlist)
-            
+            #print(altlist)            
             
             #=====================================================================
             referencegenome = uniquelist[0]
@@ -145,7 +146,6 @@ class MyVcfSim:
                 #print(templist)
             altlist = templist
             
-            #=======================================================================
             if(len(altlist) == 0):
                 altlist = "."
             else:
