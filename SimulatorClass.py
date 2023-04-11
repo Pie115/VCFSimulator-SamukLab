@@ -74,13 +74,14 @@ class MyVcfSim:
         vcfdata = pd.read_csv('mytempvcf.txt', delimiter = '\t')
         tempvcf = pd.read_csv('mytempvcf.txt', delimiter = '\t')
 
+        #OPTIMIZATION
         a = 'tsk_0'
+        col_start = tempvcf.columns.get_loc(a)
+        col_end = tempvcf.columns.get_loc(f"tsk_{self.samp_num-1}")
+        cols = tempvcf.columns[col_start:col_end+1]
+        tempvcf.loc[:, cols] = tempvcf.loc[:, cols].apply(lambda x: x.str.replace(r'|', '') if self.ploidy != 1 else x)
+        #
         
-        for i in range(self.samp_num):
-            a = a.replace(str(i-1), str(i))
-            if(self.ploidy != 1):
-                tempvcf[a] = tempvcf[a].str.replace(r'|', '')
-
         rows = len(tempvcf.index)
         iteration = 0
 
@@ -90,17 +91,23 @@ class MyVcfSim:
                 print("Loading VCF...")
                 
             uniquelist = []
+
+            #Optimization
             a = 'tsk_0'
+            col_start = vcfdata.columns.get_loc(a)
+            col_end = vcfdata.columns.get_loc(f"tsk_{self.samp_num-1}")
+            altlist = vcfdata.iloc[iteration, col_start:col_end+1].values
+            #print(altlist)
 
-            for i in range(self.samp_num):
-                a = a.replace(str(i-1), str(i))
-                altlist = tempvcf[a][iteration]
-                #print(altlist)
-                if(self.ploidy != 1):
-                    uniquelist.extend(eval(i) for i in list(altlist))
-                elif(self.ploidy == 1):
-                    uniquelist.append(tempvcf[a][iteration])
-
+            if(self.ploidy != 1):
+                for item in altlist:
+                    new_items = item.split('|')
+                    uniquelist.extend([int(x) for x in new_items])
+            elif(self.ploidy == 1):
+                uniquelist.extend([int(x) for x in altlist])
+            #print(uniquelist)
+            ##
+            
             a = 'ALT'
             altlist = tempvcf[a][iteration]
             altlist = altlist.replace(r',','')
@@ -154,19 +161,19 @@ class MyVcfSim:
             vcfdata[a][iteration] = altlist
             #print(altlist)
             #print(uniquelist)
-            #print("\n")
-
+            #print("\n")            
+        
             finaldata = [finaloutput[i:i+self.ploidy] for i in range(0, len(finaloutput), self.ploidy)]
             finaldataoutput = ["|".join(str(i) for i in data) for data in finaldata]
             #print(finaldataoutput)
 
+            #OPTIMIZATION
             a = 'tsk_0'
-
-            for i in range(self.samp_num):
-                a = a.replace(str(i-1), str(i))
-                #print(a, finaldataoutput[i])
-                vcfdata[a][iteration] = finaldataoutput[i]
-                
+            col_start = vcfdata.columns.get_loc(a)
+            col_end = vcfdata.columns.get_loc(f"tsk_{self.samp_num-1}")
+            vcfdata.iloc[iteration, col_start:col_end+1] = finaldataoutput
+            #
+            
             if(iteration % 1000 == 0):
                 print("[{0}] {1}%".format("=" * (loading + 10), loading), end="\r")
                 loading +=10
@@ -283,4 +290,3 @@ class MyVcfSim:
         os.remove(command4)
         os.remove(command5)
         os.remove(command6)
-        
