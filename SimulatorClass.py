@@ -46,6 +46,68 @@ class MyVcfSim:
         rand_array = np.empty(self.site_size, dtype = int)
                 
         return temp_array
+    
+    def row_changes(self, row, vcfdata, tempvcf):
+        uniquelist = []
+
+        a = 'tsk_0'
+        col_start = vcfdata.columns.get_loc(a)
+        col_end = vcfdata.columns.get_loc(f"tsk_{self.samp_num-1}")
+        altlist = row[col_start:col_end+1].values
+
+        if(self.ploidy != 1):
+            for item in altlist:
+                new_items = item.split('|')
+                uniquelist.extend([int(x) for x in new_items])
+        elif(self.ploidy == 1):
+            uniquelist.extend([int(x) for x in altlist])
+            
+        a = 'ALT'
+        altlist = row[a]
+        altlist = altlist.replace(r',','')
+        altlist = list(altlist)
+
+        referencegenome = uniquelist[0]
+        if(referencegenome != 0):
+            oldref = row['REF']
+            row['REF'] = altlist[referencegenome-1]
+            altlist.remove(altlist[referencegenome-1])
+            altlist.append(oldref)
+
+            for i in range(len(uniquelist)):
+                if(uniquelist[i] == 0):
+                    uniquelist[i] = len(altlist)
+                elif(uniquelist[i] == referencegenome):
+                    uniquelist[i] = 0
+                elif(uniquelist[i] != 1):
+                    uniquelist[i] -= 1
+
+        finaloutput = uniquelist   #getting temp array
+        uniquelist = np.unique(uniquelist)
+
+        templist = []
+        for i in range(len(altlist)):
+            if (i+1) in uniquelist:          
+                templist.append(altlist[i])
+        altlist = templist
+
+        if(len(altlist) == 0):
+            altlist = "."
+        else:
+            altlist = ','.join(altlist)
+
+        row[a] = altlist
+
+        finaldata = [finaloutput[i:i+self.ploidy] for i in range(0, len(finaloutput), self.ploidy)]
+        finaldataoutput = ["|".join(str(i) for i in data) for data in finaldata]
+
+        a = 'tsk_0'
+        col_start = vcfdata.columns.get_loc(a)
+        col_end = vcfdata.columns.get_loc(f"tsk_{self.samp_num-1}")
+        row[col_start:col_end+1] = finaldataoutput
+
+        return row
+
 
     def make_missing_vcf(self, ts):
         loading = 0
@@ -58,6 +120,7 @@ class MyVcfSim:
         d = open('mytempvcf.txt', 'w')
 
         a = f.readline()
+        
         linenum = 1
 
         while(a):
@@ -74,115 +137,18 @@ class MyVcfSim:
         vcfdata = pd.read_csv('mytempvcf.txt', delimiter = '\t')
         tempvcf = pd.read_csv('mytempvcf.txt', delimiter = '\t')
 
-        #OPTIMIZATION
         a = 'tsk_0'
         col_start = tempvcf.columns.get_loc(a)
         col_end = tempvcf.columns.get_loc(f"tsk_{self.samp_num-1}")
         cols = tempvcf.columns[col_start:col_end+1]
         tempvcf.loc[:, cols] = tempvcf.loc[:, cols].apply(lambda x: x.str.replace(r'|', '') if self.ploidy != 1 else x)
-        #
         
         rows = len(tempvcf.index)
         iteration = 0
-
-        while(iteration < rows):
         
-            if(iteration == 90):
-                print("Loading VCF...")
-                
-            uniquelist = []
-
-            #Optimization
-            a = 'tsk_0'
-            col_start = vcfdata.columns.get_loc(a)
-            col_end = vcfdata.columns.get_loc(f"tsk_{self.samp_num-1}")
-            altlist = vcfdata.iloc[iteration, col_start:col_end+1].values
-            #print(altlist)
-
-            if(self.ploidy != 1):
-                for item in altlist:
-                    new_items = item.split('|')
-                    uniquelist.extend([int(x) for x in new_items])
-            elif(self.ploidy == 1):
-                uniquelist.extend([int(x) for x in altlist])
-            #print(uniquelist)
-            ##
-            
-            a = 'ALT'
-            altlist = tempvcf[a][iteration]
-            altlist = altlist.replace(r',','')
-            altlist = list(altlist)
-            
-            #print(altlist)            
-            
-            #=====================================================================
-            referencegenome = uniquelist[0]
-            #print("old", altlist)
-            #print("old", uniquelist)
-            if(referencegenome != 0):
-                oldref = tempvcf['REF'][iteration]
-                vcfdata['REF'][iteration] = altlist[referencegenome-1]
-                altlist.remove(altlist[referencegenome-1])
-                altlist.append(oldref)
-                
-                for i in range(len(uniquelist)):
-                    if(uniquelist[i] == 0):
-                        uniquelist[i] = len(altlist)
-                    elif(uniquelist[i] == referencegenome):
-                        uniquelist[i] = 0
-                    elif(uniquelist[i] != 1):
-                        uniquelist[i] -= 1
-                  
-            #print("new", altlist)
-            #print("ref", vcfdata['REF'][iteration])            
-            #print(referencegenome)
-            #print("new", uniquelist)
-            #======================================================================
-            
-            
-            
-            finaloutput = uniquelist   #getting temp array
-            uniquelist = np.unique(uniquelist)
-            #print(uniquelist)
-            
-            templist = []
-            for i in range(len(altlist)):
-                if (i+1) in uniquelist:          
-                    #print(templist.append(altlist[i]))
-                    templist.append(altlist[i])
-                #print(templist)
-            altlist = templist
-            
-            if(len(altlist) == 0):
-                altlist = "."
-            else:
-                altlist = ','.join(altlist)
-
-            vcfdata[a][iteration] = altlist
-            #print(altlist)
-            #print(uniquelist)
-            #print("\n")            
-        
-            finaldata = [finaloutput[i:i+self.ploidy] for i in range(0, len(finaloutput), self.ploidy)]
-            finaldataoutput = ["|".join(str(i) for i in data) for data in finaldata]
-            #print(finaldataoutput)
-
-            #OPTIMIZATION
-            a = 'tsk_0'
-            col_start = vcfdata.columns.get_loc(a)
-            col_end = vcfdata.columns.get_loc(f"tsk_{self.samp_num-1}")
-            vcfdata.iloc[iteration, col_start:col_end+1] = finaldataoutput
-            #
-            
-            if(iteration % 1000 == 0):
-                print("[{0}] {1}%".format("=" * (loading + 10), loading), end="\r")
-                loading +=10
-            iteration += 1
-        print("[{0}] {1}%".format("=" * (loading + 10), loading), end="\r")
-        print("\nDone!")
-        #print(tempvcf)
-        #print(vcfdata)
-        
+        vcfdata = vcfdata.apply(self.row_changes, axis=1, args = (vcfdata, tempvcf)) #Changed while loop to a pandas apply function
+        #that uses a pre compiled rowchanges function with extremely optimized 
+ 
         f = open(self.outputfile, 'r')
         linenum = 1
         filearr = []
