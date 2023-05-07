@@ -47,7 +47,7 @@ def mass_simulator(sitesize, ploidy, popnum, mutationrate,
         seed+=1
         
     os.chdir(defaultdirectory) 
-    df.to_csv('ModifiedVcfResults.csv', index = False)
+    df.to_csv('CheckerResults.csv', index = False)
     
     #Outputs all the data from the main frame into its own csv file
     
@@ -58,7 +58,7 @@ def vcf_simulator(amountofruns = 1, seed = 1234, foldername = 'PixyFolder'):
     for x in range(amountofruns):
         outputfile = 'myvcf' + str(seed) + '.txt'
         foldername = 'folder' + str(seed)
-        sim = MyVcfSim(10000, 2, 1700000, 0.0000000055, 0, seed, outputfile, 20, 'population.txt', 'vcf')
+        sim = MyVcfSim(10000, 3, 1700000, 0.0000000055, 0, seed, outputfile, 20, 'population.txt', 'vcf')
         sim.simulate_vcfs()
         seed+=1
 
