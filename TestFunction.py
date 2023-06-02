@@ -8,9 +8,9 @@ from IPython.display import SVG, display
 from SimulatorClass import MyVcfSim
 
 def mass_simulator(sitesize, ploidy, popnum, mutationrate,
-                   percentmissing, seed, outputfile, sampnum, sampfile, foldername, amountofruns = 1):
+                   percentmissing, percentsitemissing, seed, outputfile, sampnum, sampfile, foldername, amountofruns = 1):
     
-    columns = ('ploidy', 'mutation_rate', 'percent_missing', 'seed')
+    columns = ('pop_num', 'ploidy', 'mutation_rate', 'percent_missing', 'percent_site_missing', 'seed')
     df = pd.DataFrame(index = columns).T #Creates a pandas data frame with the columns above.
     
     defaultdirectory = os.getcwd() 
@@ -20,7 +20,7 @@ def mass_simulator(sitesize, ploidy, popnum, mutationrate,
     for x in range(amountofruns):
         
         foldername = 'folder' + str(seed)
-        sim = MyVcfSim(sitesize, ploidy, popnum, mutationrate, percentmissing, seed, 
+        sim = MyVcfSim(sitesize, ploidy, popnum, mutationrate, percentmissing, percentsitemissing, seed, 
                        outputfile, sampnum, sampfile, foldername)
         
         #Runs simulation with the data from above.
@@ -32,8 +32,8 @@ def mass_simulator(sitesize, ploidy, popnum, mutationrate,
         #Uses pandas to read data given from pixy into another data frame
         
         data = {
-        0: {'ploidy': sim.ploidy, 'mutation_rate': sim.mutationrate, 'percent_missing': sim.percentmissing, 
-                          'seed': seed},
+        0: {'pop_num': sim.pop_num, 'ploidy': sim.ploidy, 'mutation_rate': sim.mutationrate, 'percent_missing': sim.percentmissing, 
+                          'percent_site_missing': sim.percentsitemissing, 'seed': seed},
         }
         
         df2 = pd.DataFrame(data=data, index = columns).T
@@ -47,7 +47,7 @@ def mass_simulator(sitesize, ploidy, popnum, mutationrate,
         seed+=1
         
     os.chdir(defaultdirectory) 
-    df.to_csv('CheckerResults.csv', index = False)
+    df.to_csv('Results.csv', index = False)
     
     #Outputs all the data from the main frame into its own csv file
     
@@ -56,14 +56,14 @@ def mass_simulator(sitesize, ploidy, popnum, mutationrate,
 def vcf_simulator(amountofruns = 1, seed = 1234, foldername = 'PixyFolder'):
     
     for x in range(amountofruns):
-        outputfile = 'myvcf' + str(seed) + '.txt'
+        outputfile = 'hello' + str(seed) + '.txt'
         foldername = 'folder' + str(seed)
-        sim = MyVcfSim(10000, 3, 1700000, 0.0000000055, 0, seed, outputfile, 20, 'population.txt', 'vcf')
+        sim = MyVcfSim(10000, 2, 1700000, 0.0000000055, 0, 0, seed, outputfile, 20, 'population.txt', 'vcf')
         sim.simulate_vcfs()
         seed+=1
 
 #mass_simulator(10000, 2, 1700000, 0.0000000055, 0, 1234, 'my.vcf', 20, 'population.txt', 'PixyFolder', 100)
-#Mass simulator function to run everything above.
+#Mass simulator function to run everything above.s
 #Parameters in order: Site Size, Ploidy, Population, Mutation Rate, Percent Of Missing data to be taken out,-
 #Starting seed, Output VCF file, Sample Size, Sample file, Output Folder, Amount of times to run everything
 
