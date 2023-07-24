@@ -37,10 +37,16 @@ def main():
 
     args = parser.parse_args()
 
+    if args.mu >= 1:
+        print("Error: Mutation rate must be less than 1")
 
-    vcf_simulator(amountofruns = args.replicates, seed = args.seed, sitesize = args.sequence_length, ploidy = args.ploidy, 
-                 population = args.Ne, mutationrate = args.mu, percentmissing = args.percent_missing_sites,
-                 percentsitemissing = args.percent_missing_genotypes, outputfile = args.output_file, samp_num = args.sample_size)
+    elif type(args.output_file) != str:
+        print("Error: Output_file must be a string")
+        
+    else:
+        vcf_simulator(amountofruns = args.replicates, seed = args.seed, sitesize = args.sequence_length, ploidy = args.ploidy, 
+                     population = args.Ne, mutationrate = args.mu, percentmissing = args.percent_missing_sites,
+                     percentsitemissing = args.percent_missing_genotypes, outputfile = args.output_file, samp_num = args.sample_size)
     
     #argument checker after to double check
 
