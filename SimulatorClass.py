@@ -8,13 +8,14 @@ from IPython.display import SVG, display
 
 class MyVcfSim:
     
-    def __init__(self, site_size, ploidy, pop_num, mutationrate, percentmissing, randoseed, outputfile, samp_num, samp_file, folder):
+    def __init__(self, site_size, ploidy, pop_num, mutationrate, percentmissing, percentsitemissing, randoseed, outputfile, samp_num, samp_file, folder):
         
         self.site_size = site_size
         self.ploidy = ploidy
         self.pop_num = pop_num
         self.mutationrate = mutationrate
         self.percentmissing = percentmissing
+        self.percentsitemissing = percentsitemissing
         self.randoseed = randoseed
         self.outputfile = outputfile
         self.samp_num = samp_num
@@ -54,7 +55,39 @@ class MyVcfSim:
         col_start = vcfdata.columns.get_loc(a)
         col_end = vcfdata.columns.get_loc(f"tsk_{self.samp_num-1}")
         altlist = row[col_start:col_end+1].values
-
+        
+        ############################################################
+        randomsitemissing = (self.percentsitemissing/100) * self.samp_num
+        randomsitemissing = int(randomsitemissing)
+        randomsites = np.arange(0, self.samp_num)
+        np.random.shuffle(randomsites)
+        randomsites = randomsites[:randomsitemissing]
+        #print(randomsitemissing)
+        #print(randomsites)
+        #print(altlist)
+        change = []    #initialize default change
+        for i in range(self.ploidy):
+            change.append('0') 
+        seperate = '|'
+        change = seperate.join(change)
+        
+        for sites in randomsites:
+            #print(altlist[sites])                         
+            altlist[sites] = change
+        
+        refindex = 0
+        
+        if(0 in randomsites and (self.percentsitemissing/100) != 1):
+            #print("Problem")
+            for i in range(0, self.samp_num):
+                if i not in randomsites:
+                    refindex = i * self.ploidy
+                    #print("Resolved", refindex, i)
+                    break
+            #print(refindex)
+        #print(change)
+        ############################################################
+        
         if(self.ploidy != 1):
             for item in altlist:
                 new_items = item.split('|')
@@ -67,7 +100,7 @@ class MyVcfSim:
         altlist = altlist.replace(r',','')
         altlist = list(altlist)
 
-        referencegenome = uniquelist[0]
+        referencegenome = uniquelist[refindex]
         if(referencegenome != 0):
             oldref = row['REF']
             row['REF'] = altlist[referencegenome-1]
@@ -81,10 +114,12 @@ class MyVcfSim:
                     uniquelist[i] = 0
                 elif(uniquelist[i] != 1):
                     uniquelist[i] -= 1
-
+        
+        uniquelist = np.array(uniquelist)
+                    
         finaloutput = uniquelist   #getting temp array
         uniquelist = np.unique(uniquelist)
-
+        
         templist = []
         for i in range(len(altlist)):
             if (i+1) in uniquelist:          
@@ -98,9 +133,30 @@ class MyVcfSim:
 
         row[a] = altlist
 
+        if (1 not in finaloutput and finaloutput.sum != 0): #check for edge case where array only has 2's and 0's
+            for i in range(len(finaloutput)):
+                if(finaloutput[i] > 1):
+                    finaloutput[i] -= 1
+                
         finaldata = [finaloutput[i:i+self.ploidy] for i in range(0, len(finaloutput), self.ploidy)]
         finaldataoutput = ["|".join(str(i) for i in data) for data in finaldata]
-
+        
+        ######################################
+        change = []
+        for i in range(self.ploidy):
+            change.append('.') 
+        seperate = '|'
+        change = seperate.join(change)
+    
+        for sites in randomsites:
+            #print(finaldataoutput[sites])                         
+            finaldataoutput[sites] = change
+        
+        if(self.percentsitemissing/100 == 1):
+            row['REF'] = '.'
+        
+        ######################################
+        
         a = 'tsk_0'
         col_start = vcfdata.columns.get_loc(a)
         col_end = vcfdata.columns.get_loc(f"tsk_{self.samp_num-1}")
@@ -110,7 +166,6 @@ class MyVcfSim:
 
 
     def make_missing_vcf(self, ts):
-        loading = 0
         site_mask = self.make_site_mask() #Makes sites from the number of sites in ts
 
         with open(self.outputfile, "w") as f:
