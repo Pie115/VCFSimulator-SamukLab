@@ -166,7 +166,6 @@ class MyVcfSim:
 
 
     def make_missing_vcf(self, ts):
-        loading = 0
         site_mask = self.make_site_mask() #Makes sites from the number of sites in ts
 
         with open(self.outputfile, "w") as f:
