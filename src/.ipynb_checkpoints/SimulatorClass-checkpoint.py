@@ -8,8 +8,9 @@ from IPython.display import SVG, display
 
 class MyVcfSim:
     
-    def __init__(self, site_size, ploidy, pop_num, mutationrate, percentmissing, percentsitemissing, randoseed, outputfile, samp_num, samp_file, folder):
-        
+    def __init__(self, chrom, site_size, ploidy, pop_num, mutationrate, percentmissing, percentsitemissing, randoseed, outputfile, samp_num, samp_file, folder):
+
+        self.chrom = chrom
         self.site_size = site_size
         self.ploidy = ploidy
         self.pop_num = pop_num
@@ -23,7 +24,7 @@ class MyVcfSim:
         self.folder = folder
     
     def make_site_mask(self):
-
+        #np.random.seed(self.randoseed)
         temp_percent = self.percentmissing/100 #takes percent of user input and converts it to actual percentage
         temp_var = self.site_size*temp_percent  #finds amount of VCF's that need to be taken out
         counter = range(int(temp_var)) #Makes a counter to traverse VCF's
@@ -49,6 +50,7 @@ class MyVcfSim:
         return temp_array
     
     def row_changes(self, row, vcfdata, tempvcf):
+        #np.random.seed(self.randoseed)
         uniquelist = []
 
         a = 'tsk_0'
@@ -166,6 +168,7 @@ class MyVcfSim:
 
 
     def make_missing_vcf(self, ts):
+        np.random.seed(self.randoseed)
         site_mask = self.make_site_mask() #Makes sites from the number of sites in ts
 
         with open(self.outputfile, "w") as f:
@@ -216,19 +219,27 @@ class MyVcfSim:
             linenum += 1
         os.remove(self.outputfile)
 
-        vcfdata.to_csv(self.outputfile, mode = 'a', index = False, sep = '\t', header = True)
+        vcfdata["CHROM"] = self.chrom
+        vcfdata["POS"] += 1
+        vcfdata["ID"] = '.'
+        
+        if(self.outputfile != 'None'):
+            vcfdata.to_csv(self.outputfile, mode = 'a', index = False, sep = '\t', header = True)
+        
+            with open(self.outputfile, 'r+') as f: 
+                tempdata = f.read() 
+                f.seek(0, 0) 
+                for lines in filearr:
+                    f.write(lines)
+                f.write('#' + tempdata)
 
-        with open(self.outputfile, 'r+') as f: 
-            tempdata = f.read() 
-            f.seek(0, 0) 
-            for lines in filearr:
-                f.write(lines)
-            f.write('#' + tempdata)
+        else:
+            display(vcfdata.to_string())
 
         os.remove('mytempvcf.txt')
         
     def make_population_file(self):
-
+        np.random.seed(self.randoseed)
         file = open(self.samp_file, "a") #Makes a text file full of population data as a parameter for pixy
 
         for x in range(0, self.samp_num):
@@ -236,7 +247,7 @@ class MyVcfSim:
         file.close()
 
     def simulate_vcfs(self):
-        
+        np.random.seed(self.randoseed)
         ts = msprime.sim_ancestry(samples=[msprime.SampleSet(self.samp_num, ploidy=self.ploidy)], population_size = self.pop_num, random_seed=self.randoseed, sequence_length = self.site_size)
         #sample here without changes^
 
