@@ -106,7 +106,7 @@ def main():
     parser._action_groups.pop()
     required = parser.add_argument_group('required arguments')
     optional = parser.add_argument_group('optional arguments')
-    
+
     optional.add_argument('--chromosome', type=str, nargs = '?', help = 'Chromosome name', required = False)
     optional.add_argument('--replicates', type=int, nargs = '?', help = 'Amount of times for Simulator to run', required = False)
     required.add_argument('--seed', type=int, nargs = '?', help = 'Random seed for VCFSim to use', required = True)
@@ -126,9 +126,14 @@ def main():
     if args.param_file is not None:
         multiple_chrom(chromfilename = args.param_file, seed = args.seed, percentmissing = args.percent_missing_sites, percentsitemissing = args.percent_missing_genotypes, outputfile = args.output_file, samp_num = args.sample_size)
     
-    elif (agrs.param_file is None and (args.chromosome is None or args.replicates is None or args.sequence_length is None
+    elif (args.param_file is None and (args.chromosome is None or args.replicates is None or args.sequence_length is None
                                       or args.ploidy is None or args.Ne is None or args.mu is None)):
         print("Error, no parameter file is specified, or missing one of the following arguments: chromosome, replicates, sequence_length, ploidy, population size, or mutation rate")
+
+    elif (args.param_file is not None and (args.chromosome is not None or args.replicates is not None or 
+                                           args.sequence_length is not None or args.ploidy is not 
+                                           None or args.Ne is not None or args.mu is not None)):
+        print("Error,  parameter file is specified, however so are one of the following: chromosome, replicates, sequence_length, ploidy, population size, or mutation rate")
     
     elif args.mu >= 1:
         print("Error: Mutation rate must be less than 1")
