@@ -8,7 +8,7 @@ requirements = [
 
 setup(
     name='vcfsim',
-    version='1.0.6-alpha',
+    version='1.0.6.alpha',
     packages=['vcfsim'],
     entry_points={
         'console_scripts': [
