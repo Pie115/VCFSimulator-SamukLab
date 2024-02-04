@@ -6,7 +6,7 @@ import os
 import time
 import argparse
 from IPython.display import SVG, display
-from SimulatorClass import MyVcfSim
+from .SimulatorClass import MyVcfSim
 import warnings
 
 def multiple_chrom(chromfilename = 'input.txt', seed = 1234, foldername = 'PixyFolder', percentmissing = 0, percentsitemissing = 0, outputfile = 'myvcftest', samp_num = 20):
