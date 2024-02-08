@@ -3,3 +3,11 @@ VCFSim is a new command-line tool for generating simulated VCF's(variant call fo
 
 ## Author 
 Paimon Goulart (UC Riverside)
+
+## Installation
+Vcfsim is currently available on bioconda, and can be installed using the following command:
+```shell
+conda install bioconda::vcfsim
+```
+
+For more installation instructions, please visit: https://bioconda.github.io/recipes/vcfsim/README.html?highlight=vcfsi#package-package%20&#x27;vcfsim&#x27;
