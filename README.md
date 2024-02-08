@@ -52,5 +52,7 @@ vcfsim --chromosome 1 --replicates 1 --seed 1234 --sequence_length 10000 --ploid
 This will create a vcf output file by the name of myvcf1234, or myvcf followed by the seed given for the input.  
 If input for replicates was given as a higher number than 1, 2 for example, then vcfsim will create two output files by the name of myvcf1234 and myvcf1235, adding one to the seed after every run.
 
+Screenshot of output file:
+<img width="1065" alt="Vcfsim Screenshot" src="https://github.com/Pie115/VCFSimulator-SamukLab/assets/6378028/ec374ec4-b57f-4666-9478-cd3462c46e4f">
 
 
