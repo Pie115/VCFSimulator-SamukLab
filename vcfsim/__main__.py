@@ -89,7 +89,7 @@ def vcf_simulator(chrom = 1, amountofruns = 1, seed = 1234, foldername = 'PixyFo
     
     for x in range(amountofruns):
         if outputfile is not None:
-            outputfilename = outputfile + str(seed) + '.txt'
+            outputfilename = outputfile + str(seed) + '.vcf'
         else:
             outputfilename = 'None'
             
