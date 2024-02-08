@@ -12,3 +12,13 @@ conda install bioconda::vcfsim
 
 For more installation instructions, please visit: 
 https://bioconda.github.io/recipes/vcfsim/README.html?highlight=vcfsi#package-package%20&#x27;vcfsim&#x27;
+
+## Arguments 
+Here is the list of required/optional arguments to run vcfsim
+
+### Required
+--seed [SEED] Random seed for VCFSim to use
+--percent_missing_sites [PERCENT_MISSING_SITES] Percent of rows missing from your VCF
+--percent_missing_genotypes [PERCENT_MISSING_GENOTYPES] Percent of samples missing from your VCF
+--sample_size [SAMPLE_SIZE] Amount of samples from population in VCF
+
