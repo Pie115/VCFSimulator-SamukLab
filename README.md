@@ -10,4 +10,5 @@ Vcfsim is currently available on bioconda, and can be installed using the follow
 conda install bioconda::vcfsim
 ```
 
-For more installation instructions, please visit: https://bioconda.github.io/recipes/vcfsim/README.html?highlight=vcfsi#package-package%20&#x27;vcfsim&#x27;
+For more installation instructions, please visit: 
+https://bioconda.github.io/recipes/vcfsim/README.html?highlight=vcfsi#package-package%20&#x27;vcfsim&#x27;
