@@ -10,7 +10,7 @@ Vcfsim is currently available on bioconda, and can be installed by using the fol
 conda install bioconda::vcfsim
 ```
 
-For more installation instructions, please visit: 
+For more installation instructions, please visit:  
 https://bioconda.github.io/recipes/vcfsim/README.html?highlight=vcfsi#package-package%20&#x27;vcfsim&#x27;
 
 ## Arguments 
@@ -41,5 +41,16 @@ Here is the list of required/optional arguments to run vcfsim
 --output_file [OUTPUT_FILE] Filename of outputed vcf, will automatically be followed by seed  
 
 --param_file [PARAM_FILE] Specified file for multiple chromosome inputs  
+
+## Usage
+Typical usage for vcf sim can be done by using the following command:  
+
+```shell
+vcfsim --chromosome 1 --replicates 1 --seed 1234 --sequence_length 10000 --ploidy 2 --Ne 100000 --mu .000001 --percent_missing_sites 0 --percent_missing_genotypes 0 --output_file myvcf  --sample_size 10
+```
+
+This will create a vcf output file by the name of myvcf1234, or myvcf followed by the seed given for the input.  
+If input for replicates was given as a higher number than 1, 2 for example, then vcfsim will create two output files by the name of myvcf1234 and myvcf1235, adding one to the seed after every run.
+
 
 
