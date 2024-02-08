@@ -25,4 +25,21 @@ Here is the list of required/optional arguments to run vcfsim
 
 --sample_size [SAMPLE_SIZE] Amount of samples from population in VCF  
 
+### Optional
+--chromosome [CHROMOSOME] Chromosome name  
+
+--replicates [REPLICATES] Amount of times for Simulator to run  
+
+--sequence_length [SEQUENCE_LENGTH] Size of your site  
+
+--ploidy [PLOIDY] Ploidy for your VCF  
+
+--Ne [NE] Effective population size of the simulated population  
+
+--mu [MU] Mutation rate in the simulated population  
+
+--output_file [OUTPUT_FILE] Filename of outputed vcf, will automatically be followed by seed  
+
+--param_file [PARAM_FILE] Specified file for multiple chromosome inputs  
+
 
