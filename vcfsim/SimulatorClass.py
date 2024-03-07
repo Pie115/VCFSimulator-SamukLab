@@ -19,7 +19,7 @@ class MyVcfSim:
         self.percentsitemissing = percentsitemissing
         self.randoseed = randoseed
         self.outputfile = outputfile
-        self.samp_num = samp_num
+        self.samp_num = samp_num + 1
         self.samp_file = samp_file
         self.folder = folder
     
@@ -222,6 +222,8 @@ class MyVcfSim:
         vcfdata["CHROM"] = self.chrom
         vcfdata["POS"] += 1
         vcfdata["ID"] = '.'
+
+        del vcfdata["tsk_0"]
         
         if(self.outputfile != 'None'):
             vcfdata.to_csv(self.outputfile, mode = 'a', index = False, sep = '\t', header = True)
