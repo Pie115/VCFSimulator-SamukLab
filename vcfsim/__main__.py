@@ -67,7 +67,6 @@ def multiple_chrom(chromfilename = 'input.txt', seed = 1234, foldername = 'PixyF
                        chromlist[i], samp_num, 'population.txt', 'vcf')
         
         sim.simulate_vcfs()
-        seed += 1
     
     with open(outputfile, "w") as f:
         pass
