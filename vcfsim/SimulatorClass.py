@@ -61,7 +61,9 @@ class MyVcfSim:
         ############################################################
         randomsitemissing = (self.percentsitemissing/100) * self.samp_num
         randomsitemissing = int(randomsitemissing)
-        randomsites = np.arange(0, self.samp_num)
+        
+        #Start with one in order to account for the first site being stricly used as a reference!!
+        randomsites = np.arange(1, self.samp_num)
         np.random.shuffle(randomsites)
         randomsites = randomsites[:randomsitemissing]
         #print(randomsitemissing)
@@ -79,9 +81,10 @@ class MyVcfSim:
         
         refindex = 0
         
-        if(0 in randomsites and (self.percentsitemissing/100) != 1):
+        #Start with one in order to account for the first site being stricly used as a reference!!
+        if(1 in randomsites and (self.percentsitemissing/100) != 1):
             #print("Problem")
-            for i in range(0, self.samp_num):
+            for i in range(1, self.samp_num):
                 if i not in randomsites:
                     refindex = i * self.ploidy
                     #print("Resolved", refindex, i)
