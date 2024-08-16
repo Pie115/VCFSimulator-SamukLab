@@ -59,8 +59,10 @@ class MyVcfSim:
         altlist = row[col_start:col_end+1].values
         
         ############################################################
-        randomsitemissing = (self.percentsitemissing/100) * self.samp_num
-        randomsitemissing = int(randomsitemissing)
+        randomsitemissing = int((self.percentsitemissing/100) * (self.samp_num-1)) #we have to subtract one to this
+        #To account for reference site being added
+        #Start with one in order to account for the first site being stricly used as a reference!!
+        #MAKE IT LOOK LIKE THIS
         
         #Start with one in order to account for the first site being stricly used as a reference!!
         randomsites = np.arange(1, self.samp_num)
