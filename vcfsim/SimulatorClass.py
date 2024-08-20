@@ -27,7 +27,7 @@ class MyVcfSim:
         #np.random.seed(self.randoseed)
         temp_percent = self.percentmissing/100 #takes percent of user input and converts it to actual percentage
         temp_var = self.site_size*temp_percent  #finds amount of VCF's that need to be taken out
-        counter = range(int(temp_var)) #Makes a counter to traverse VCF's
+        counter = range(round(temp_var)) #Makes a counter to traverse VCF's
         temp_array = np.zeros(self.site_size, dtype = int) #Makes array of 0's 
         
         mylist = np.arange(0, self.site_size,1) #Generates an array of 1-size_size
