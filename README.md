@@ -1,11 +1,11 @@
-# VCFSim
-VCFSim is a new command-line tool for generating simulated VCF's(variant call format files for encoding genetic data). Leveraging a coalescent simulating backend and providing an interface from Msprime coalescent simulating package to pandas. VCF's can now be easily simulated with just a few command line arguments!
+# vcfsim
+vcfsim is a new command-line tool for generating simulated VCF's(variant call format files for encoding genetic data). Leveraging a coalescent simulating backend and providing an interface from Msprime coalescent simulating package to pandas. VCF's can now be easily simulated with just a few command line arguments!
 
 ## Author 
 Paimon Goulart (UC Riverside)
 
 ## Installation
-Vcfsim is currently available on bioconda, and can be installed by using the following command:
+vcfsim is currently available on bioconda, and can be installed by using the following command:
 ```shell
 conda install bioconda::vcfsim
 ```
@@ -17,7 +17,7 @@ https://bioconda.github.io/recipes/vcfsim/README.html?highlight=vcfsi#package-pa
 Here is the list of required/optional arguments to run vcfsim
 
 ### Required
---seed [SEED] Random seed for VCFSim to use  
+--seed [SEED] Random seed for vcfsim to use  
 
 --percent_missing_sites [PERCENT_MISSING_SITES] Percent of rows missing from your VCF  
 
