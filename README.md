@@ -87,6 +87,8 @@ Where `names.txt` might contain:
 A1 B1 C1 D1 E1
 ```
 
+Otherwise, sample identifiers will default to tsk_0,...,tsk_n
+
 ### Multiple chromosome inputs
 Another way vcfsim can be used is by providing a file for multiple chromosome inputs.  
 
