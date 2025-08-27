@@ -1,10 +1,17 @@
 # vcfsim
-vcfsim is a new command-line tool for generating simulated VCF's(variant call format files for encoding genetic data). Leveraging a coalescent simulating backend and providing an interface from Msprime coalescent simulating package to pandas. VCF's can now be easily simulated with just a few command line arguments!
+vcfsim is a new command-line tool for generating simulated VCF's (variant call format files for encoding genetic data). Leveraging a coalescent simulating backend and providing an interface from Msprime coalescent simulating package to pandas. VCF's can now be easily simulated with just a few command line arguments!
 
 ## Author 
 Paimon Goulart (UC Riverside)
 
 ## Installation
+First create and activate a conda environment for vcfsim:
+
+```shell
+conda create -n vcfsim_env python=3.10
+conda activate vcfsim_env
+```
+
 vcfsim is currently available on bioconda, and can be installed by using the following command:
 ```shell
 conda install bioconda::vcfsim
@@ -23,7 +30,10 @@ Here is the list of required/optional arguments to run vcfsim
 
 --percent_missing_genotypes [PERCENT_MISSING_GENOTYPES] Percent of samples missing from your VCF  
 
---sample_size [SAMPLE_SIZE] Amount of samples from population in VCF  
+One of the following three options must also be provided to set the samples:  
+- --sample_size [SAMPLE_SIZE] Amount of samples from population in VCF  
+- --samples [SAMPLES ...] Custom sample names, space separated (e.g. A1 B1 C1)  
+- --samples_file [SAMPLES_FILE] File containing one whitespace separated line of custom sample names  
 
 ### Optional
 --chromosome [CHROMOSOME] Chromosome name  
@@ -46,7 +56,7 @@ Here is the list of required/optional arguments to run vcfsim
 Typical usage for vcfsim can be done by using the following command:  
 
 ```shell
-vcfsim --chromosome 1 --replicates 1 --seed 1234 --sequence_length 10000 --ploidy 2 --Ne 100000 --mu .000001 --percent_missing_sites 0 --percent_missing_genotypes 0 --output_file myvcf  --sample_size 10
+vcfsim --chromosome 1 --replicates 1 --seed 1234 --sequence_length 10000 --ploidy 2 --Ne 100000 --mu .000001 --percent_missing_sites 0 --percent_missing_genotypes 0 --output_file myvcf --sample_size 10
 ```
 
 This will create a vcf output file by the name of myvcf1234, or myvcf followed by the seed given for the input.  
@@ -57,6 +67,27 @@ NOTE: An output file doesn't needed to be specified. If no output file is specif
 Screenshot of output file:
 <img width="1065" alt="Vcfsim Screenshot" src="https://github.com/Pie115/VCFSimulator-SamukLab/assets/6378028/ec374ec4-b57f-4666-9478-cd3462c46e4f">
 
+### Using custom sample names
+Instead of `--sample_size`, you can provide explicit names:  
+
+```shell
+vcfsim --chromosome 1 --replicates 1 --seed 1234 --sequence_length 10000 --ploidy 2 --Ne 100000 --mu .000001 --percent_missing_sites 0 --percent_missing_genotypes 0 --output_file myvcf --samples A1 B1 C1 D1
+```
+
+This will automatically set the sample size to 4 and label the VCF columns `A1 B1 C1 D1`.  
+
+You can also read the names from a file containing a single whitespace separated line:  
+
+```shell
+vcfsim --chromosome 1 --replicates 1 --seed 1234 --sequence_length 10000 --ploidy 2 --Ne 100000 --mu .000001 --percent_missing_sites 0 --percent_missing_genotypes 0 --output_file myvcf --samples_file names.txt
+```
+
+Where `names.txt` might contain:  
+```
+A1 B1 C1 D1 E1
+```
+
+### Multiple chromosome inputs
 Another way vcfsim can be used is by providing a file for multiple chromosome inputs.  
 
 Your input file should be in the form of a text file, and should be formatted as such:  
@@ -68,7 +99,13 @@ Each row will represent a seperate run of vcfsim, all these runs will be concate
 The following command should be used when running vcfsim in this way:
 
 ```shell
-vcfsim  --seed 1234  --percent_missing_sites 0 --percent_missing_genotypes 0 --output_file myvcf  --sample_size 10 --param_file input.txt
+vcfsim --seed 1234 --percent_missing_sites 0 --percent_missing_genotypes 0 --output_file myvcf --sample_size 10 --param_file input.txt
+```
+
+You can also combine a param file with custom names:
+
+```shell
+vcfsim --seed 1234 --percent_missing_sites 0 --percent_missing_genotypes 0 --output_file myvcf --samples_file names.txt --param_file input.txt
 ```
 
 When done this way, the output should look like such:  
@@ -76,4 +113,3 @@ When done this way, the output should look like such:
 
 With the concatenated vcf looking like:  
 <img width="1059" alt="ExampleInput" src="https://github.com/Pie115/VCFSimulator-SamukLab/assets/6378028/fb6508eb-34cd-473a-bc19-762858ed4c31">
-
