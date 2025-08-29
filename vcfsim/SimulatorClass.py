@@ -184,19 +184,15 @@ class MyVcfSim:
             body_buf.write(line)
         body_buf.seek(0)
 
-        vcfdata = pd.read_csv(body_buf, delimiter='\t')
-        body_buf.seek(0)
-        tempvcf = pd.read_csv(body_buf, delimiter='\t')
-
-        a = 'tsk_0'
-        self.col_start = tempvcf.columns.get_loc(a)
-        self.col_end = tempvcf.columns.get_loc(f"tsk_{self.samp_num - 1}")
-
-        cols = tempvcf.columns[self.col_start:self.col_end + 1]
-        for c in cols:
-            tempvcf[c] = tempvcf[c].str.replace('|', '', regex=False)
+        vcfdata = pd.read_csv(body_buf, delimiter = '\t')
         
-        vcfdata = vcfdata.apply(self.row_changes, axis=1, args=(vcfdata, tempvcf))
+        a = 'tsk_0'
+        self.col_start = vcfdata.columns.get_loc(a)
+        self.col_end = vcfdata.columns.get_loc(f"tsk_{self.samp_num - 1}")
+        
+        tempvcf = vcfdata
+        
+        vcfdata = vcfdata.apply(self.row_changes, axis = 1, args = (vcfdata, tempvcf))
  
         vcfdata["CHROM"] = self.chrom
         vcfdata["POS"] = vcfdata["POS"] + 1
