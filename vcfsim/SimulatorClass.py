@@ -224,8 +224,8 @@ class MyVcfSim:
                 for line in header_lines:
                     fout.write(line)
 
-                fout.write('#vcfsim version 1.0.17.alpha\n')
-                fout.write('#vcfsim command ' + ' '.join(sys.argv) + '\n')
+                fout.write('##vcfsim_version=1.0\n')
+                fout.write('##vcfsim_command=' + ' '.join(sys.argv) + '\n')
 
                 csv_buf = io.StringIO()
                 vcfdata.to_csv(csv_buf, index=False, sep='\t', header=True)
