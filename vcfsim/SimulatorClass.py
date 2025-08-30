@@ -216,13 +216,19 @@ class MyVcfSim:
         
         if (self.outputfile != 'None'):
             with open(self.outputfile, 'w') as fout:
+                
+                #Replace the existing ##source line with a single version to display version and command
+                for i, line in enumerate(header_lines):
+                    if line.startswith("##source="):
+                        new_source = '##source=tskit 0.6.4, vcfsim 1.0.21.alpha, ' + ' '.join(sys.argv).replace('\t', ' ').strip() + '\n'
+                        header_lines[i] = new_source
+                        break
 
+                #Write all header lines including the modified one
                 for line in header_lines:
                     fout.write(line)
 
-                #fout.write('##vcfsim_version=1.0\n')
-                #fout.write('##vcfsim_command=' + ' '.join(sys.argv) + '\n')
-
+                #Write the data portion of the VCF
                 csv_buf = io.StringIO()
                 vcfdata.to_csv(csv_buf, index=False, sep='\t', header=True)
                 csv_text = csv_buf.getvalue()
