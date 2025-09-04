@@ -6,7 +6,7 @@ import os
 import time
 import argparse
 from IPython.display import SVG, display
-from .SimulatorClass import MyVcfSim
+from SimulatorClass import MyVcfSim
 import warnings
 
 def multiple_chrom(chromfilename = 'input.txt', seed = 1234, foldername = 'PixyFolder', percentmissing = 0, percentsitemissing = 0, outputfile = 'myvcftest', samp_num = 20, sample_names = None):
@@ -140,21 +140,39 @@ def main():
 
     args = parser.parse_args()
 
-    # read custom names if provided
+    #read custom names if provided
     custom_names = None
+
     if args.samples_file is not None:
         try:
             with open(args.samples_file, 'r') as sf:
-                line = sf.readline()
+                line = sf.readline().strip()
+
+            #Check if it's a comma separated list
+            if ',' not in line:
+                raise ValueError("Error: Sample names in the file must be comma-separated (e.g., A1,B1,C1)")
+
+            #Convert to space separated string and split into list
+            line = line.replace(',', ' ')
             tokens = line.split()
+
             if len(tokens) < 1:
-                print('Error, samples file must contain at least one name')
+                print('Error: samples file must contain at least one name')
                 sys.exit(0)
+
             custom_names = tokens
+
         except Exception as e:
-            print('Error, could not read samples file')
+            print(f'Error reading samples file: {e}')
             sys.exit(0)
+
     elif args.samples is not None and len(args.samples) > 0:
+        #Validate that the input is a single comma separated string
+        if len(args.samples) == 1 and ',' in args.samples[0]:
+            args.samples = args.samples[0].replace(',', ' ').split()
+        elif len(args.samples) > 1:
+            raise ValueError("Error: --samples must be passed as a single comma-separated string (e.g., A1,B1,C1)")
+
         custom_names = args.samples
 
     if args.param_file is not None:
