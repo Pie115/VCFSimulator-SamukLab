@@ -9,7 +9,8 @@ import io
 
 class MyVcfSim:
     
-    def __init__(self, chrom, site_size, ploidy, pop_num, mutationrate, percentmissing, percentsitemissing, randoseed, outputfile, samp_num, samp_file, folder, sample_names = None):
+    def __init__(self, chrom, site_size, ploidy, pop_num, mutationrate, percentmissing, percentsitemissing, randoseed, outputfile, samp_num, samp_file, folder, sample_names = None,
+                 population_mode = 2, time = 1000):
 
         self.chrom = chrom
         self.site_size = site_size
@@ -23,6 +24,8 @@ class MyVcfSim:
         self.samp_num = samp_num + 1
         self.samp_file = samp_file
         self.folder = folder
+        self.population_mode = population_mode
+        self.time = time
 
         # store custom names if provided
         if sample_names is not None:
@@ -247,7 +250,28 @@ class MyVcfSim:
 
     def simulate_vcfs(self):
         np.random.seed(self.randoseed)
-        ts = msprime.sim_ancestry(samples=[msprime.SampleSet(self.samp_num, ploidy=self.ploidy)], population_size=self.pop_num, random_seed=self.randoseed, sequence_length=self.site_size)
+
+
+        if self.population_mode == 1:
+            #same as always
+            ts = msprime.sim_ancestry(samples=[msprime.SampleSet(self.samp_num, ploidy=self.ploidy)], population_size=self.pop_num, random_seed=self.randoseed, sequence_length=self.site_size)
+        else:
+            #two population mode: C (size 2x) splits into A and B at self.time
+            demography = msprime.Demography()
+            demography.add_population(name="A", initial_size=self.pop_num)
+            demography.add_population(name="B", initial_size=self.pop_num)
+            demography.add_population(name="C", initial_size=self.pop_num * 2)
+            demography.add_population_split(time=self.time, derived=["A", "B"], ancestral="C")
+            
+            #Split the total number of samples into two groups: A and B
+            #We intentionally *do not* simulate samples from C (the ancestral population)
+            #This ensures that all samples come from the derived populations A and B
+
+            nA = self.samp_num // 2  #Half of the samples (rounded down) from population A
+            nB = self.samp_num - nA  #The remaining samples from population B
+            samples = [msprime.SampleSet(nA, population="A", ploidy=self.ploidy), msprime.SampleSet(nB, population="B", ploidy=self.ploidy)]
+            
+            ts = msprime.sim_ancestry(samples=samples, demography=demography, random_seed=self.randoseed, sequence_length=self.site_size)
 
         rlg = np.random.default_rng(self.randoseed)
         rchar = rlg.integers(low=0, high=4)

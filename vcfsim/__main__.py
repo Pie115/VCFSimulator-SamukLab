@@ -6,10 +6,10 @@ import os
 import time
 import argparse
 from IPython.display import SVG, display
-from SimulatorClass import MyVcfSim
+from .SimulatorClass import MyVcfSim
 import warnings
 
-def multiple_chrom(chromfilename = 'input.txt', seed = 1234, foldername = 'PixyFolder', percentmissing = 0, percentsitemissing = 0, outputfile = 'myvcftest', samp_num = 20, sample_names = None):
+def multiple_chrom(chromfilename = 'input.txt', seed = 1234, foldername = 'PixyFolder', percentmissing = 0, percentsitemissing = 0, outputfile = 'myvcftest', samp_num = 20, sample_names = None, population_mode = 1, time = 1000):
     
     f = open(chromfilename, "r")
 
@@ -63,8 +63,7 @@ def multiple_chrom(chromfilename = 'input.txt', seed = 1234, foldername = 'PixyF
         sys.exit(0)
 
     for i in range(len(chromlist)):
-        sim = MyVcfSim(chromlist[i], lengthlist[i], ploidylist[i], nelist[i], mulist[i], percentmissing, percentsitemissing, seed, 
-                       chromlist[i], samp_num, 'population.txt', 'vcf', sample_names)
+        sim = MyVcfSim(chromlist[i], lengthlist[i], ploidylist[i], nelist[i], mulist[i], percentmissing, percentsitemissing, seed, chromlist[i], samp_num, 'population.txt', 'vcf', sample_names, population_mode, time)
         
         sim.simulate_vcfs()
     
@@ -84,7 +83,7 @@ def multiple_chrom(chromfilename = 'input.txt', seed = 1234, foldername = 'PixyF
                 destination.writelines(lines[6:])
         os.remove(chromlist[i])
 
-def vcf_simulator(chrom = 1, amountofruns = 1, seed = 1234, foldername = 'PixyFolder', sitesize = 10000, ploidy = 2, population = 1700000, mutationrate = 0.0000000055, percentmissing = 0, percentsitemissing = 0, outputfile = 'myvcftest', samp_num = 20, sample_names = None):
+def vcf_simulator(chrom = 1, amountofruns = 1, seed = 1234, foldername = 'PixyFolder', sitesize = 10000, ploidy = 2, population = 1700000, mutationrate = 0.0000000055, percentmissing = 0, percentsitemissing = 0, outputfile = 'myvcftest', samp_num = 20, sample_names = None, population_mode = 1, time = 1000):
     
     # when custom sample names are provided we set sample size from the names
     if sample_names is not None:
@@ -104,8 +103,7 @@ def vcf_simulator(chrom = 1, amountofruns = 1, seed = 1234, foldername = 'PixyFo
         else:
             outputfilename = 'None'
             
-        sim = MyVcfSim(chrom, sitesize, ploidy, population, mutationrate, percentmissing, percentsitemissing, seed, outputfilename, 
-                       samp_num, 'population.txt', 'vcf', sample_names)
+        sim = MyVcfSim(chrom, sitesize, ploidy, population, mutationrate, percentmissing, percentsitemissing, seed, outputfilename, samp_num, 'population.txt', 'vcf', sample_names, population_mode, time)
 
         sim.simulate_vcfs()
         seed+=1
@@ -130,6 +128,9 @@ def main():
     optional.add_argument('--output_file', nargs = '?', help = 'Filename of outputed vcf, will automatically be followed by seed', required = False)    
 
     optional.add_argument('--param_file', nargs = '?', help = 'Specified file for multiple chromosome inputs', required = False)
+
+    optional.add_argument('--population_mode', type=int, nargs='?', help='1 = single population (default), 2 = population C splits into A and B at given time', required=False)
+    optional.add_argument('--time', type=int, nargs='?', help='Time of split (only used if --population_mode is 2)', required=False)
 
     #choose one way to specify samples
     #either a numeric sample size or explicit names or a file of names
@@ -175,6 +176,22 @@ def main():
 
         custom_names = args.samples
 
+    if args.population_mode is not None:
+        
+        population_mode = args.population_mode
+    else:
+        population_mode = 1
+
+    if args.time is not None:
+        time_value = args.time
+    else:
+        time_value = 1000
+
+    if population_mode not in [1, 2]:
+        print("Error: --population_mode must be either 1 or 2")
+        sys.exit(0)
+
+
     if args.param_file is not None:
         # when using multiple chromosome file we forward the custom names too
         # sample size must be determined here so we never pass None
@@ -183,7 +200,7 @@ def main():
         else:
             effective_samp_num = args.sample_size
 
-        multiple_chrom(chromfilename = args.param_file, seed = args.seed, percentmissing = args.percent_missing_sites, percentsitemissing = args.percent_missing_genotypes, outputfile = args.output_file, samp_num = effective_samp_num, sample_names = custom_names)
+        multiple_chrom(chromfilename = args.param_file, seed = args.seed, percentmissing = args.percent_missing_sites, percentsitemissing = args.percent_missing_genotypes, outputfile = args.output_file, samp_num = effective_samp_num, sample_names = custom_names, population_mode = population_mode, time = time_value)
     
     elif (args.param_file is None and (args.chromosome is None or args.replicates is None or args.sequence_length is None
                                       or args.ploidy is None or args.Ne is None or args.mu is None)):
@@ -201,9 +218,7 @@ def main():
         print("Error: Output_file must be a string")
         
     else:
-        vcf_simulator(chrom = args.chromosome , amountofruns = args.replicates, seed = args.seed, sitesize = args.sequence_length, 
-                     ploidy = args.ploidy, population = args.Ne, mutationrate = args.mu, percentmissing = args.percent_missing_sites,
-                     percentsitemissing = args.percent_missing_genotypes, outputfile = args.output_file, samp_num = args.sample_size, sample_names = custom_names)
+        vcf_simulator(chrom = args.chromosome , amountofruns = args.replicates, seed = args.seed, sitesize = args.sequence_length, ploidy = args.ploidy, population = args.Ne, mutationrate = args.mu, percentmissing = args.percent_missing_sites, percentsitemissing = args.percent_missing_genotypes, outputfile = args.output_file, samp_num = args.sample_size, sample_names = custom_names, population_mode = population_mode, time = time_value)
     
     #argument checker after to double check
     
