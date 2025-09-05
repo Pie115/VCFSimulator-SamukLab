@@ -194,7 +194,9 @@ def main():
     if args.time is not None:
         time_value = args.time
     else:
-        time_value = 1000
+        time_value = 1000 #We pass dummy time value if population_mode is 1 to avoid error, however this doesn't effect performance in any way
+        if(population_mode == 2):
+            raise ValueError("Error: Time must be passed when --population_mode is 2")
 
     if population_mode != 1 and population_mode != 2:
         print("Error: --population_mode must be either 1 or 2")
