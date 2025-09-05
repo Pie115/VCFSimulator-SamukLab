@@ -179,6 +179,15 @@ def main():
     if args.population_mode is not None:
         
         population_mode = args.population_mode
+
+        if(population_mode == 2):
+            if(args.samples is not None and len(args.samples) % 2 != 0):
+                raise ValueError("Error: Number of samples must be even when --population_mode is 2")
+            if(custom_names is not None and len(custom_names) % 2 != 0):
+                raise ValueError("Error: Number of samples must be even when --population_mode is 2")
+            if(args.sample_size is not None and args.sample_size % 2 != 0):
+                raise ValueError("Error: Number of samples must be even when --population_mode is 2")
+
     else:
         population_mode = 1
 
@@ -187,7 +196,7 @@ def main():
     else:
         time_value = 1000
 
-    if population_mode not in [1, 2]:
+    if population_mode != 1 and population_mode != 2:
         print("Error: --population_mode must be either 1 or 2")
         sys.exit(0)
 
