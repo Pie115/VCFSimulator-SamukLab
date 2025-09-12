@@ -223,7 +223,7 @@ class MyVcfSim:
                 #Replace the existing ##source line with a single version to display version and command
                 for i, line in enumerate(header_lines):
                     if line.startswith("##source="):
-                        new_source = '##source=tskit 0.6.4, vcfsim 1.0.23.alpha, ' + ' '.join(sys.argv).replace('\t', ' ').strip() + '\n'
+                        new_source = '##source=tskit 0.6.4, vcfsim 1.0.24.alpha, ' + ' '.join(sys.argv).replace('\t', ' ').strip() + '\n'
                         header_lines[i] = new_source
                         break
 
