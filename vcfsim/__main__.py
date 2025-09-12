@@ -127,7 +127,7 @@ def main():
     required.add_argument('--percent_missing_genotypes', type=int, nargs = '?', help = 'Percent of samples missing from your VCF', required = True) #percent missing genotypes, percent of genotypes that are missing from samples    
     optional.add_argument('--output_file', nargs = '?', help = 'Filename of outputed vcf, will automatically be followed by seed', required = False)    
 
-    optional.add_argument('--param_file', nargs = '?', help = 'Specified file for multiple chromosome inputs', required = False)
+    optional.add_argument('--chromosome_file', nargs = '?', help = 'Specified file for multiple chromosome inputs', required = False)
 
     optional.add_argument('--population_mode', type=int, nargs='?', help='1 = single population (default), 2 = population C splits into A and B at given time', required=False)
     optional.add_argument('--time', type=int, nargs='?', help='Time of split (only used if --population_mode is 2)', required=False)
@@ -203,7 +203,7 @@ def main():
         sys.exit(0)
 
 
-    if args.param_file is not None:
+    if args.chromosome_file is not None:
         # when using multiple chromosome file we forward the custom names too
         # sample size must be determined here so we never pass None
         if custom_names is not None:
@@ -211,13 +211,13 @@ def main():
         else:
             effective_samp_num = args.sample_size
 
-        multiple_chrom(chromfilename = args.param_file, seed = args.seed, percentmissing = args.percent_missing_sites, percentsitemissing = args.percent_missing_genotypes, outputfile = args.output_file, samp_num = effective_samp_num, sample_names = custom_names, population_mode = population_mode, time = time_value)
+        multiple_chrom(chromfilename = args.chromosome_file, seed = args.seed, percentmissing = args.percent_missing_sites, percentsitemissing = args.percent_missing_genotypes, outputfile = args.output_file, samp_num = effective_samp_num, sample_names = custom_names, population_mode = population_mode, time = time_value)
     
-    elif (args.param_file is None and (args.chromosome is None or args.replicates is None or args.sequence_length is None
+    elif (args.chromosome_file is None and (args.chromosome is None or args.replicates is None or args.sequence_length is None
                                       or args.ploidy is None or args.Ne is None or args.mu is None)):
         print("Error, no parameter file is specified, or missing one of the following arguments: chromosome, replicates, sequence_length, ploidy, population size, or mutation rate")
 
-    elif (args.param_file is not None and (args.chromosome is not None or args.replicates is not None or 
+    elif (args.chromosome_file is not None and (args.chromosome is not None or args.replicates is not None or 
                                            args.sequence_length is not None or args.ploidy is not 
                                            None or args.Ne is not None or args.mu is not None)):
         print("Error,  parameter file is specified, however so are one of the following: chromosome, replicates, sequence_length, ploidy, population size, or mutation rate")
