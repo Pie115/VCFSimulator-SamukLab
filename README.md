@@ -50,7 +50,11 @@ One of the following three options must also be provided to set the samples:
 
 --output_file [OUTPUT_FILE] Filename of outputed vcf, will automatically be followed by seed  
 
---param_file [PARAM_FILE] Specified file for multiple chromosome inputs  
+--chromosome_file [CHROMOSOME_FILE] Specified file for multiple chromosome inputs  
+
+--population_mode [1|2] Mode of population structure to simulate. 1 = single population (default), 2 = structured population (C splits into A & B).
+
+--time [TIME] Split time for population mode 2 (e.g. generations before present). Required if --population_mode 2 is specified.
 
 ## Usage
 Typical usage for vcfsim can be done by using the following command:  
@@ -89,6 +93,14 @@ A1 B1 C1 D1 E1
 
 Otherwise, sample identifiers will default to tsk_0,...,tsk_n
 
+
+### Simulating a structured population split (population_mode = 2)
+To simulate a demographic split between populations A and B from an ancestral population C:
+
+```shell
+vcfsim --chromosome 1 --replicates 1 --seed 1234 --sequence_length 10000 --ploidy 2 --Ne 100000 --mu .000001 --percent_missing_sites 0 --percent_missing_genotypes 0 --output_file myvcf --sample_size 10 --population_mode 2 --time 1000
+```
+
 ### Multiple chromosome inputs
 Another way vcfsim can be used is by providing a file for multiple chromosome inputs.  
 
@@ -101,13 +113,13 @@ Each row will represent a seperate run of vcfsim, all these runs will be concate
 The following command should be used when running vcfsim in this way:
 
 ```shell
-vcfsim --seed 1234 --percent_missing_sites 0 --percent_missing_genotypes 0 --output_file myvcf --sample_size 10 --param_file input.txt
+vcfsim --seed 1234 --percent_missing_sites 0 --percent_missing_genotypes 0 --output_file myvcf --sample_size 10 --chromosome_file input.txt
 ```
 
 You can also combine a param file with custom names:
 
 ```shell
-vcfsim --seed 1234 --percent_missing_sites 0 --percent_missing_genotypes 0 --output_file myvcf --samples_file names.txt --param_file input.txt
+vcfsim --seed 1234 --percent_missing_sites 0 --percent_missing_genotypes 0 --output_file myvcf --samples_file names.txt --chromosome_file input.txt
 ```
 
 When done this way, the output should look like such:  
