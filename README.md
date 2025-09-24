@@ -70,7 +70,7 @@ If input for replicates was given as a higher number than 1, 2 for example, then
 NOTE: An output file doesn't needed to be specified. If no output file is specified, then the vcf will be outputed to the command line.
 
 Screenshot of output file:
-<img width="1065" alt="Vcfsim Screenshot" src="https://github.com/Pie115/VCFSimulator-SamukLab/assets/6378028/ec374ec4-b57f-4666-9478-cd3462c46e4f">
+<img width="1437" height="458" alt="Image" src="https://github.com/user-attachments/assets/11078b68-6a62-44e0-bf8d-87c34544b2a6" />
 
 ### Using custom sample names
 Instead of `--sample_size`, you can provide explicit names:  
@@ -124,7 +124,7 @@ vcfsim --seed 1234 --percent_missing_sites 0 --percent_missing_genotypes 0 --out
 ```
 
 When done this way, the output should look like such:  
-<img width="1062" alt="Inputfile" src="https://github.com/Pie115/VCFSimulator-SamukLab/assets/6378028/a16c488a-3ad0-4138-a8e0-d3abac245c7f">
+<img width="1437" height="458" alt="Image" src="https://github.com/user-attachments/assets/11078b68-6a62-44e0-bf8d-87c34544b2a6" />
 
 With the concatenated vcf looking like:  
 <img width="1059" alt="ExampleInput" src="https://github.com/Pie115/VCFSimulator-SamukLab/assets/6378028/fb6508eb-34cd-473a-bc19-762858ed4c31">
